@@ -136,6 +136,7 @@ class SCFL_env(env_utils, env_agent_utils):
         self.E = self._Energy()  # Energy
         """============= Global Iter ============="""
         self.num_Iglob = self._calculateGlobalIteration()  # Global Iterations
+        
         if self.num_Iglob < 0:
             print(f"local_acc:{self.butt}|skip:{self.sample_skip}")
         self.Au = self.factor_Iu * self.C_u * self.D_u  # Iterations x Cycles x Samples
