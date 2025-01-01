@@ -8,8 +8,9 @@ from envs.env_utils import *
 from envs.env_agent_utils import *
 from envs.commcal_utils import *
 from utils.func_utils import *
-from dataset_est.mnist_est import *
+from dataset_est.mnist_est import * ## importing the kl_div_mnist function
 from dataset_est.cifar_est import *
+
 
 class SCFL_env(env_utils, env_agent_utils):
     def __init__(self, args):
