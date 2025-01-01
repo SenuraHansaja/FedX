@@ -2,6 +2,7 @@ import numpy as np
 from utils.setting_setup import *
 import scipy
 import math
+from dataset_est.mnist_est import *
 
 
 class env_utils():
@@ -70,7 +71,7 @@ class env_utils():
         DataRate = self.B * self.beta * np.log2(1 + (Numerator / Denominator))
         return DataRate
 
-    def _calculateGlobalIteration(self):
+    def _calculateGlobalIteration(self, entropyH, sampling_ratio, gloabl_acc):
         """
         :params    : Lipschitz ~ L-smooth
         :params    : Xi ~ Constants
@@ -82,18 +83,21 @@ class env_utils():
         ==================================================
         :return: required number of rounds for convergence
         """
-        mutual_I = self.coeff_c0 * np.exp(-self.coeff_c1 * self.sample_delay * self.sample_skip)
-        self.Psi = 2 ** self.entropyH * np.sqrt(2 * (self.entropyH - mutual_I))
+        ##mutual_I = self.coeff_c0 * np.exp(-self.coeff_c1 * self.sample_delay * self.sample_skip) ## ms min told me we dont nee this  self.coeff_c0 as we dont use the mutual information in the FEdX paper
+        self.Psi = (1/(2*entropyH)) * np.sqrt(2* kl_div_mnist(sampling_ratio))
 
-        Numerator = np.log(1 / self.target_acc) * 2 * self.N_User * (self.Lipschitz**2) * self.xi
-        Denominator = (self.xi * (self.Lipschitz + 2) * self.Psi) + \
-                      (self.xi * self.Lipschitz / self.N_User) - (self.local_acc * self.gamma)
-        return np.average(Numerator / Denominator)
+        # Numerator = np.log(1 / self.target_acc) * 2 * self.N_User * (self.Lipschitz**2) * self.xi
+        # Denominator = (self.xi * (self.Lipschitz + 2) * self.Psi) + \
+        #               (self.xi * self.Lipschitz / self.N_User) - (self.local_acc * self.gamma)
+        Numerator_new = 2 * self.xi * self.N_User * np.log(gloabl_acc) ## this is the numerator as per the fedX paper this was instructed by Min   
+        Denominator_new = (self.Lipschitz + 1) * self.Psi * self.xi + self.Lipschitz * self.xi - self.gamma * self.local_acc ## if anything wrong all the blame goes to Min
+       
+        return np.ceil(np.average(Numerator_new / Denominator_new -1))
 
     def _calculateLocalIteration(self):
-        v = 2 / ((2 - self.Lipschitz * self.delta) * self.delta * self.gamma)
-        w = np.log2(1 / self.local_acc)
-        return v, v * w
+        numerator = 2 * np.log(self.local_acc)
+        denominator = (2 - self.Lipschitz * np.floor(2/self.Lipschitz)) * np.floor(2/self.Lipschitz) * self.gamma
+        return np.ceil(np.average(numerator / denominator -1))
 
     def _calTimeTrans(self):
         self.DataRate = self._calculateDataRate(self.ChannelGain.reshape(1, -1))
@@ -105,7 +109,7 @@ class env_utils():
         """
         self.DataRate = self._calculateDataRate(self.ChannelGain.reshape(1, -1))
         # Calculate computation energy
-        self.factor_Iu, self.num_Iu = self._calculateLocalIteration()  # Local Iterations
+        self.num_Iu = self._calculateLocalIteration()  # Local Iterations
         self.EC_u = self.num_Iu * self.kappa*self.C_u*self.D_u*(self.f_u**2)
         self.ES_u = (self.S_coeff*self.D_u*self.sample_delay*self.sample_skip)*(0.1/32)
         # Calculate transmission energy
