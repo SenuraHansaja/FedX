@@ -39,7 +39,7 @@ class ReplayBuffer:
         self.obs_buf[self.ptr] = obs
         self.next_obs_buf[self.ptr] = next_obs
         self.acts_buf[self.ptr] = act
-        self.rews_buf[self.ptr] = rew
+        self.rews_buf[self.ptr] = np.average(rew)
         self.done_buf[self.ptr] = done
         self.ptr = (self.ptr + 1) % self.max_size
         self.size = min(self.size + 1, self.max_size)

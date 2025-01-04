@@ -83,21 +83,19 @@ class env_utils():
         ==================================================
         :return: required number of rounds for convergence
         """
-        ##mutual_I = self.coeff_c0 * np.exp(-self.coeff_c1 * self.sample_delay * self.sample_skip) ## ms min told me we dont nee this  self.coeff_c0 as we dont use the mutual information in the FEdX paper
-        self.Psi = (1/(2*entropyH)) * np.sqrt(2* kl_div_mnist(sampling_ratio))
 
-        # Numerator = np.log(1 / self.target_acc) * 2 * self.N_User * (self.Lipschitz**2) * self.xi
-        # Denominator = (self.xi * (self.Lipschitz + 2) * self.Psi) + \
-        #               (self.xi * self.Lipschitz / self.N_User) - (self.local_acc * self.gamma)
-        Numerator_new = 2 * self.xi * self.N_User * np.log(gloabl_acc) ## this is the numerator as per the fedX paper this was instructed by Min   
-        Denominator_new = (self.Lipschitz + 1) * self.Psi * self.xi + self.Lipschitz * self.xi - self.gamma * self.local_acc ## if anything wrong all the blame goes to Min
-       
-        return np.ceil(np.average(Numerator_new / Denominator_new -1))
+        self.Psi = (1/(2*entropyH)) * np.sqrt(2* kl_div_mnist(sampling_ratio))
+        print(sampling_ratio)
+        Numerator_new = 2 * self.xi * self.N_User * np.log(gloabl_acc)
+        Denominator_new = (self.Lipschitz + 1) * self.Psi * self.xi + self.Lipschitz * self.xi - self.gamma * self.local_acc
+        global_iteration = np.ceil(np.average(Numerator_new / Denominator_new ))
+        return global_iteration
 
     def _calculateLocalIteration(self):
         numerator = 2 * np.log(self.local_acc)
-        denominator = (2 - self.Lipschitz * np.floor(2/self.Lipschitz)) * np.floor(2/self.Lipschitz) * self.gamma
-        return np.ceil(np.average(numerator / denominator -1))
+        denominator = (2 - self.Lipschitz * np.floor(2/self.Lipschitz+1)) * np.floor(2/self.Lipschitz+1) * self.gamma
+        local_iteration = np.ceil(np.average(numerator / denominator))
+        return local_iteration
 
     def _calTimeTrans(self):
         self.DataRate = self._calculateDataRate(self.ChannelGain.reshape(1, -1))
