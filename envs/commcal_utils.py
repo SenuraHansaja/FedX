@@ -25,4 +25,4 @@ if __name__ == '__main__':
     frequency_mhz = 2500  # frequency in megahertz
 
     wavelength_m = speed_of_light / (frequency_mhz * 10 ** 6)
-    print(wavelength_m)
+    # print(wavelength_m)

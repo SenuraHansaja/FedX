@@ -155,7 +155,7 @@ class SAC(object):
             os.makedirs('checkpoints/')
         if ckpt_path is None:
             ckpt_path = "checkpoints/sac_checkpoint_{}_{}".format(env_name, suffix)
-        print('Saving models to {}'.format(ckpt_path))
+        # print('Saving models to {}'.format(ckpt_path))
         torch.save({'policy_state_dict': self.actor.state_dict(),
                     'critic_state_dict': self.critic.state_dict(),
                     'critic_target_state_dict': self.critic_target.state_dict(),
@@ -164,7 +164,7 @@ class SAC(object):
 
     # Load model parameters
     def load_checkpoint(self, ckpt_path, evaluate=False):
-        print('Loading models from {}'.format(ckpt_path))
+        # print('Loading models from {}'.format(ckpt_path))
         if ckpt_path is not None:
             checkpoint = torch.load(ckpt_path)
             self.actor.load_state_dict(checkpoint['policy_state_dict'])
@@ -192,7 +192,7 @@ class SAC(object):
                     "-" + args.ai_network + "-" + args.algo + "-" + str(args.poweru_max) + \
                     "-" + str(args.global_acc) + "-" + str(args.f_u_max) + "-" + str(args.data_size) + \
                     "-" + str(args.skip_max) + "-" + str(args.sample_delay)
-        print(algo_name)
+        # print(algo_name)
 
         """Train the agent."""
         list_results = []

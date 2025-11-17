@@ -85,7 +85,7 @@ class env_utils():
         """
 
         self.Psi = (1/(2*entropyH)) * np.sqrt(2* kl_div_mnist(sampling_ratio))
-        print(sampling_ratio)
+        # print(sampling_ratio)
         Numerator_new = 2 * self.xi * self.N_User * np.log(gloabl_acc)
         Denominator_new = (self.Lipschitz + 1) * self.Psi * self.xi + self.Lipschitz * self.xi - self.gamma * self.local_acc
         global_iteration = np.ceil(np.average(Numerator_new / Denominator_new ))

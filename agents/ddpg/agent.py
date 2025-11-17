@@ -67,7 +67,7 @@ class DDPGAgent:
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )
-        print(self.device)
+        # print(self.device)
 
         # networks
         self.actor = Actor(self.obs_dim, self.action_dim).to(self.device)

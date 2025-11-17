@@ -1,2 +1,2 @@
 # FedX
-Sample Size distribution adjusting based on DRL
+sample size driven distribution adjusting based on DRL
